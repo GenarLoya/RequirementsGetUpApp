@@ -2,8 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import { apiReference } from '@scalar/express-api-reference';
 import ViteExpress from 'vite-express';
 import { setupFatalErrorHandlers } from './common/filters/fatal-error.filter';
 import { errorHandler } from './common/filters/error-handler.filter';
@@ -34,12 +34,18 @@ app.use(loggerMiddleware);
 // Generate Swagger specification
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-// Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Form Builder API Documentation',
-  customfavIcon: '/favicon.ico',
-}));
+// Scalar API Reference - Beautiful, modern API documentation
+app.use(
+  '/reference',
+  apiReference({
+    spec: {
+      content: swaggerSpec,
+    },
+    theme: 'default',
+    layout: 'modern',
+    defaultOpenAllTags: true,
+  })
+);
 
 /**
  * @swagger
@@ -80,13 +86,13 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 const httpServer = ViteExpress.listen(app, Number(PORT), () => {
   console.log(`
-╔═════════════════════════════════════════════╗
-║  Server is running!                         ║
-║  Port: ${PORT}                                 ║
+╔═════════════════════════════════════════════════════╗
+║  Server is running!                                 ║
+║  Port: ${PORT}                                      ║
 ║  Environment: ${process.env.NODE_ENV || 'development'}                   ║
-║  API: http://localhost:${PORT}/api             ║
-║  Swagger UI: http://localhost:${PORT}/api-docs ║
-╚═════════════════════════════════════════════╝
+║  API: http://localhost:${PORT}/api                  ║
+║  API Reference: http://localhost:${PORT}/reference  ║
+╚═════════════════════════════════════════════════════╝
   `);
 });
 
