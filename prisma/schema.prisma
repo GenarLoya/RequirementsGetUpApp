@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  forms         Form[]
+  formResponses FormResponse[]
+}
+
+model Form {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  userId      String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions Question[]
+  responses FormResponse[]
+}
+
+model Question {
+  id       String       @id @default(uuid())
+  formId   String
+  text     String
+  type     QuestionType @default(TEXT)
+  order    Int
+  required Boolean      @default(false)
+  options  Json?
+  
+  form    Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers Answer[]
+}
+
+model FormResponse {
+  id          String   @id @default(uuid())
+  formId      String
+  userId      String?
+  submittedAt DateTime @default(now())
+  
+  form    Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  answers Answer[]
+}
+
+model Answer {
+  id         String @id @default(uuid())
+  responseId String
+  questionId String
+  value      String
+  
+  response FormResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum QuestionType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  EMAIL
+  RADIO
+  CHECKBOX
+  SELECT
+  DATE
+}
