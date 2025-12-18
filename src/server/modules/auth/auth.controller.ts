@@ -14,9 +14,19 @@ export class AuthController {
       throw new BadRequestException(result.error.issues[0].message);
     }
 
-    const data = await this.authService.register(result.data);
+    const { token, user } = await this.authService.register(result.data);
     
-    res.status(201).json(data);
+    // Set HTTP-only cookie
+    res.cookie('auth_token', token, {
+      httpOnly: true,      // Cannot be accessed by JavaScript
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'lax',     // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+    
+    // Return user data (NOT the token)
+    res.status(201).json({ user });
   };
 
   login = async (req: Request, res: Response) => {
@@ -27,9 +37,19 @@ export class AuthController {
       throw new BadRequestException(result.error.issues[0].message);
     }
 
-    const data = await this.authService.login(result.data);
+    const { token, user } = await this.authService.login(result.data);
     
-    res.json(data);
+    // Set HTTP-only cookie
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    
+    // Return user data (NOT the token)
+    res.json({ user });
   };
 
   me = async (req: Request, res: Response) => {
@@ -37,5 +57,17 @@ export class AuthController {
     const userData = await this.authService.findById(user.id);
     
     res.json(userData);
+  };
+
+  logout = async (req: Request, res: Response) => {
+    // Clear the auth cookie
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    
+    res.status(204).send();
   };
 }

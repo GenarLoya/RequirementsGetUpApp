@@ -4,27 +4,23 @@ import { UnauthorizedException } from '../exceptions';
 
 /**
  * Authentication middleware
- * Verifies JWT token and attaches user to request object
+ * Verifies JWT token from HTTP-only cookie or Authorization header
  */
 export const authMiddleware = (req: Request, _res: Response, next: NextFunction) => {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    // Try cookie first (frontend web apps - most secure)
+    let token = req.cookies?.auth_token;
     
-    if (!authHeader) {
-      throw new UnauthorizedException('No authorization header provided');
+    // Fallback to Authorization header (API testing tools, mobile apps)
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
     }
-    
-    // Check if it's a Bearer token
-    if (!authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Invalid authorization format. Use: Bearer <token>');
-    }
-    
-    // Extract token
-    const token = authHeader.substring(7);
     
     if (!token) {
-      throw new UnauthorizedException('No token provided');
+      throw new UnauthorizedException('Authentication required');
     }
     
     // Verify token

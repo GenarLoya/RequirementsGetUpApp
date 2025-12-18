@@ -3,6 +3,7 @@ import { envConfig } from "./config/env.config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import swaggerJsdoc from "swagger-jsdoc";
 import { apiReference } from "@scalar/express-api-reference";
 import ViteExpress from "vite-express";
@@ -15,6 +16,7 @@ import { swaggerOptions } from "./config/swagger.config";
 // Import modules
 import authModule from "./modules/auth/auth.module";
 import formsModule from "./modules/forms/forms.module";
+import questionsModule from "./modules/questions/questions.module";
 
 // Create Express app
 const app = express();
@@ -25,7 +27,13 @@ app.use(
     contentSecurityPolicy: false, // Disable for Swagger UI to work
   }),
 );
-app.use(cors());
+app.use(cors({
+  origin: envConfig.nodeEnv === 'production' 
+    ? envConfig.domain 
+    : 'http://localhost:5173', // Vite dev server
+  credentials: true, // Allow cookies to be sent
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(loggerMiddleware);
@@ -76,6 +84,7 @@ app.get("/api/health", (_, res) => {
 // API routes
 app.use("/api/auth", authModule);
 app.use("/api/forms", formsModule);
+app.use("/api/forms/:formId/questions", questionsModule);
 
 // Error handling middleware (MUST be last)
 app.use(prismaErrorHandler);
@@ -88,8 +97,8 @@ const httpServer = ViteExpress.listen(app, Number(envConfig.port), () => {
 ║  Server is running!                                  ║
 ║  Domain: ${envConfig.domain}                         ║
 ║  Environment: ${envConfig.nodeEnv}                   ║
-║  API: ${envConfig.domain}/api                ║
-║  API Reference: $ {envConfig.domain}/reference ║
+║  API: ${envConfig.domain}/api                        ║
+║  API Reference: $ {envConfig.domain}/reference       ║
 ╚══════════════════════════════════════════════════════╝
   `);
 });

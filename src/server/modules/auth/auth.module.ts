@@ -115,4 +115,21 @@ router.post('/login', asyncHandler(authController.login));
  */
 router.get('/me', authMiddleware, asyncHandler(authController.me));
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     description: Clear authentication cookie and logout user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: Successfully logged out
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
+router.post('/logout', authMiddleware, asyncHandler(authController.logout));
+
 export default router;
