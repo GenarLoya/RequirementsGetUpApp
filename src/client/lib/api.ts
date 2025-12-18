@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * Axios instance configured for API calls
@@ -6,9 +6,9 @@ import axios from 'axios';
  * - Automatically redirects to /login on 401 responses
  */
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true, // Critical: Send HTTP-only cookies with requests
 });
@@ -20,10 +20,13 @@ api.interceptors.response.use(
     // Redirect to login on authentication errors
     if (error.response?.status === 401) {
       // Only redirect if not already on login/register page
-      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
-        window.location.href = '/login';
+      if (
+        !window.location.pathname.includes("/login") &&
+        !window.location.pathname.includes("/register")
+      ) {
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
