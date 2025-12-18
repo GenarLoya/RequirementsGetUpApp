@@ -34,7 +34,7 @@ export const swaggerOptions: Options = {
     },
     servers: [
       {
-        url: `http://${envConfig.domain}/api`,
+        url: `${envConfig.domain}/api`,
         description: "Server",
       },
     ],
