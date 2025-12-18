@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "./config/env.config";
+import { envConfig } from "./config/env.config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -82,17 +82,15 @@ app.use(prismaErrorHandler);
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 3000;
-
-const httpServer = ViteExpress.listen(app, Number(PORT), () => {
+const httpServer = ViteExpress.listen(app, Number(envConfig.port), () => {
   console.log(`
-╔═════════════════════════════════════════════════════╗
-║  Server is running!                                 ║
-║  Port: ${PORT}                                      ║
-║  Environment: ${process.env.NODE_ENV || "development"}                   ║
-║  API: http://localhost:${PORT}/api                  ║
-║  API Reference: http://localhost:${PORT}/reference  ║
-╚═════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════╗
+║  Server is running!                                  ║
+║  Domain: ${envConfig.domain}                         ║
+║  Environment: ${envConfig.nodeEnv}                   ║
+║  API: ${envConfig.domain}/api                ║
+║  API Reference: $ {envConfig.domain}/reference ║
+╚══════════════════════════════════════════════════════╝
   `);
 });
 

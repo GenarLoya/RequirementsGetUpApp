@@ -1,75 +1,74 @@
-import { Options } from 'swagger-jsdoc';
+import { Options } from "swagger-jsdoc";
+import { envConfig } from "./env.config";
 
 export const swaggerOptions: Options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Form Builder API',
-      version: '1.0.0',
+      title: "Form Builder API",
+      version: "1.0.0",
       description: `
         A comprehensive API for creating and managing requirement gathering forms.
-        
+
         ## Features
         - User authentication with JWT
         - Form creation and management
         - Question types: TEXT, TEXTAREA, NUMBER, EMAIL, RADIO, CHECKBOX, SELECT, DATE
         - Form responses and analytics
-        
+
         ## Authentication
         Most endpoints require authentication. Use the **Authorize** button to set your Bearer token.
-        
+
         1. Register a new user at \`/api/auth/register\`
         2. Login at \`/api/auth/login\` to get your JWT token
         3. Click the **Authorize** button and enter: \`Bearer <your-token>\`
       `,
       contact: {
-        name: 'API Support',
-        email: 'support@formbuilder.com',
+        name: "API Support",
+        email: "support@formbuilder.com",
       },
       license: {
-        name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT',
+        name: "MIT",
+        url: "https://opensource.org/licenses/MIT",
       },
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Development server',
-      },
-      {
-        url: 'http://localhost:3000',
-        description: 'Production server (update URL as needed)',
+        url: `http://${envConfig.domain}/api`,
+        description: "Server",
       },
     ],
     tags: [
       {
-        name: 'Auth',
-        description: 'Authentication endpoints - Register, login, and user management',
+        name: "Auth",
+        description:
+          "Authentication endpoints - Register, login, and user management",
       },
       {
-        name: 'Forms',
-        description: 'Form management - Create, read, update, and delete forms',
+        name: "Forms",
+        description: "Form management - Create, read, update, and delete forms",
       },
       {
-        name: 'Questions',
-        description: 'Question management - Add and manage questions within forms',
+        name: "Questions",
+        description:
+          "Question management - Add and manage questions within forms",
       },
       {
-        name: 'Responses',
-        description: 'Form responses - Submit and view form responses',
+        name: "Responses",
+        description: "Form responses - Submit and view form responses",
       },
       {
-        name: 'Health',
-        description: 'Health check endpoints',
+        name: "Health",
+        description: "Health check endpoints",
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'Enter your JWT token obtained from /api/auth/login',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Enter your JWT token obtained from /api/auth/login",
         },
       },
       schemas: {
@@ -77,23 +76,23 @@ export const swaggerOptions: Options = {
       },
       responses: {
         UnauthorizedError: {
-          description: 'Access token is missing or invalid',
+          description: "Access token is missing or invalid",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
                   statusCode: {
-                    type: 'number',
+                    type: "number",
                     example: 401,
                   },
                   message: {
-                    type: 'string',
-                    example: 'Unauthorized',
+                    type: "string",
+                    example: "Unauthorized",
                   },
                   error: {
-                    type: 'string',
-                    example: 'Unauthorized',
+                    type: "string",
+                    example: "Unauthorized",
                   },
                 },
               },
@@ -101,23 +100,23 @@ export const swaggerOptions: Options = {
           },
         },
         BadRequestError: {
-          description: 'Invalid request data',
+          description: "Invalid request data",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
                   statusCode: {
-                    type: 'number',
+                    type: "number",
                     example: 400,
                   },
                   message: {
-                    type: 'string',
-                    example: 'Invalid input',
+                    type: "string",
+                    example: "Invalid input",
                   },
                   error: {
-                    type: 'string',
-                    example: 'Bad Request',
+                    type: "string",
+                    example: "Bad Request",
                   },
                 },
               },
@@ -125,23 +124,23 @@ export const swaggerOptions: Options = {
           },
         },
         NotFoundError: {
-          description: 'Resource not found',
+          description: "Resource not found",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
                   statusCode: {
-                    type: 'number',
+                    type: "number",
                     example: 404,
                   },
                   message: {
-                    type: 'string',
-                    example: 'Resource not found',
+                    type: "string",
+                    example: "Resource not found",
                   },
                   error: {
-                    type: 'string',
-                    example: 'Not Found',
+                    type: "string",
+                    example: "Not Found",
                   },
                 },
               },
@@ -149,23 +148,23 @@ export const swaggerOptions: Options = {
           },
         },
         ForbiddenError: {
-          description: 'Access forbidden',
+          description: "Access forbidden",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
                   statusCode: {
-                    type: 'number',
+                    type: "number",
                     example: 403,
                   },
                   message: {
-                    type: 'string',
-                    example: 'You do not have access to this resource',
+                    type: "string",
+                    example: "You do not have access to this resource",
                   },
                   error: {
-                    type: 'string',
-                    example: 'Forbidden',
+                    type: "string",
+                    example: "Forbidden",
                   },
                 },
               },
@@ -181,8 +180,8 @@ export const swaggerOptions: Options = {
     ],
   },
   apis: [
-    './src/server/modules/**/*.ts',
-    './src/server/docs/schemas/*.ts',
-    './src/server/main.ts',
+    "./src/server/modules/**/*.ts",
+    "./src/server/docs/schemas/*.ts",
+    "./src/server/main.ts",
   ],
 };
